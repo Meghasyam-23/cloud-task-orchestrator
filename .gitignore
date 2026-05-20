@@ -1,11 +1,4 @@
-.env
-.venv/
 __pycache__/
-*.pyc
-node_modules/
-dist/
-build/
-.DS_Store
-*.log
-.idea/
-.vscode/
+*.py[cod]
+frontend/dist
+frontend/node_modules

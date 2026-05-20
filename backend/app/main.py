@@ -1,4 +1,7 @@
+import os
+
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from redis.exceptions import RedisError
 
 from app.job_store import JobNotFoundError, JobStore
@@ -17,6 +20,20 @@ app = FastAPI(
     title="Cloud Task Orchestrator API",
     version="0.1.0",
     description="Backend API for queueing asynchronous cloud tasks.",
+)
+
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+    if origin.strip()
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 
