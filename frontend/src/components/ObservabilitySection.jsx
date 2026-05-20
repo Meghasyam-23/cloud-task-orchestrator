@@ -29,14 +29,21 @@ const TASK_COLORS = {
 
 export function ObservabilitySection({ metrics, loading }) {
   return (
-    <section className="observability-grid" aria-label="Observability visuals">
+    <section className="observability-grid" aria-label="Observability charts">
       <ThroughputChart data={metrics.throughputData} loading={loading} />
       <StatusDonut data={metrics.statusData} total={metrics.stats.total} loading={loading} />
-      <PipelineVisualization data={metrics.pipelineData} total={metrics.stats.total} />
       <TaskTypeBreakdown data={metrics.taskTypeData} loading={loading} />
-      <WorkerInsights insights={metrics.insights} />
       <ArchitectureCard />
     </section>
+  );
+}
+
+export function OperationsTelemetry({ metrics }) {
+  return (
+    <div className="operations-telemetry" aria-label="Queue pipeline and worker insights">
+      <PipelineVisualization data={metrics.pipelineData} total={metrics.stats.total} />
+      <WorkerInsights insights={metrics.insights} />
+    </div>
   );
 }
 
@@ -125,7 +132,7 @@ function PipelineVisualization({ data, total }) {
         <PipelineNode label="Queued" value={queued} tone="queued" />
         <PipelineArrow />
         <PipelineNode label="Running" value={running} tone="running" />
-        <PipelineArrow />
+        <PipelineArrow className="terminal-arrow" />
         <div className="terminal-nodes">
           <PipelineNode label="Completed" value={completed} tone="completed" />
           <PipelineNode label="Failed" value={failed} tone="failed" />
@@ -237,9 +244,9 @@ function PipelineNode({ label, value, tone }) {
   );
 }
 
-function PipelineArrow() {
+function PipelineArrow({ className = "" }) {
   return (
-    <div className="pipeline-arrow" aria-hidden="true">
+    <div className={`pipeline-arrow ${className}`} aria-hidden="true">
       <GitBranch size={16} />
     </div>
   );

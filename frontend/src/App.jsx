@@ -15,6 +15,12 @@ const ObservabilitySection = lazy(() =>
   })),
 );
 
+const OperationsTelemetry = lazy(() =>
+  import("./components/ObservabilitySection.jsx").then((module) => ({
+    default: module.OperationsTelemetry,
+  })),
+);
+
 function App() {
   const [health, setHealth] = useState(null);
   const [jobs, setJobs] = useState([]);
@@ -89,20 +95,24 @@ function App() {
 
       <HealthCards health={health} stats={metrics.stats} loading={loading} />
 
+      <section className="operations-grid" aria-label="Primary operations">
+        <JobForm submitting={submitting} onSubmit={handleCreateJob} />
+        <Suspense fallback={<section className="panel observability-loading compact">Loading queue telemetry...</section>}>
+          <OperationsTelemetry metrics={metrics} />
+        </Suspense>
+      </section>
+
       <Suspense fallback={<section className="panel observability-loading">Loading observability views...</section>}>
         <ObservabilitySection metrics={metrics} loading={loading} />
       </Suspense>
 
-      <div className="dashboard-grid">
-        <div className="main-column">
-          <JobForm submitting={submitting} onSubmit={handleCreateJob} />
-          <JobsTable
-            jobs={jobs}
-            loading={loading}
-            selectedJobId={selectedJobId}
-            onSelectJob={(job) => setSelectedJobId(job.job_id)}
-          />
-        </div>
+      <div className="jobs-inspector-grid">
+        <JobsTable
+          jobs={jobs}
+          loading={loading}
+          selectedJobId={selectedJobId}
+          onSelectJob={(job) => setSelectedJobId(job.job_id)}
+        />
         <JobDetailPanel job={selectedJob} onClose={() => setSelectedJobId(null)} />
       </div>
     </main>
