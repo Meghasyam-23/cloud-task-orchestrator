@@ -7,30 +7,26 @@ import { QueuePipeline } from "../components/ObservabilitySection.jsx";
 export function OverviewView({ health, jobs, loading, metrics, onSelectJob, onSubmitJob, selectedJob, selectedJobId, submitting }) {
   const recentJobs = [...jobs]
     .sort((a, b) => new Date(b.updated_at ?? b.created_at) - new Date(a.updated_at ?? a.created_at))
-    .slice(0, 6);
+    .slice(0, 8);
 
   return (
     <section className="view-stack overview-view" aria-label="Overview">
       <HealthCards health={health} stats={metrics.stats} loading={loading} />
-      <div className="command-grid">
-        <div className="command-main">
-          <JobForm submitting={submitting} onSubmit={onSubmitJob} />
-          <JobsTable
-            compact
-            description="Latest jobs from the live queue."
-            emptyDescription="Submit a job to populate recent activity."
-            jobs={recentJobs}
-            loading={loading}
-            onSelectJob={onSelectJob}
-            selectedJobId={selectedJobId}
-            title="Recent jobs"
-          />
-        </div>
-        <aside className="command-rail" aria-label="Queue status and inspection">
-          <QueuePipeline data={metrics.pipelineData} total={metrics.stats.total} />
-          <JobDetailPanel job={selectedJob} metrics={metrics} onClose={() => onSelectJob(null)} />
-        </aside>
+      <div className="overview-command">
+        <JobForm compact submitting={submitting} onSubmit={onSubmitJob} />
+        <QueuePipeline data={metrics.pipelineData} total={metrics.stats.total} />
+        <JobDetailPanel job={selectedJob} metrics={metrics} onClose={() => onSelectJob(null)} />
       </div>
+      <JobsTable
+        compact
+        description="Latest activity from the live queue."
+        emptyDescription="Submit a job to populate recent activity."
+        jobs={recentJobs}
+        loading={loading}
+        onSelectJob={onSelectJob}
+        selectedJobId={selectedJobId}
+        title="Recent jobs"
+      />
     </section>
   );
 }

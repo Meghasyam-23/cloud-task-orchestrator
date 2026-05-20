@@ -26,10 +26,8 @@ function App() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [themeMode, setThemeMode] = useState(() => {
-    return window.localStorage.getItem(THEME_STORAGE_KEY) ?? "system";
-  });
-  const [systemTheme, setSystemTheme] = useState(() => {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+    return stored === "light" || stored === "dark" ? stored : "dark";
   });
 
   const selectedJob = useMemo(
@@ -38,7 +36,7 @@ function App() {
   );
 
   const metrics = useMemo(() => deriveJobMetrics(jobs), [jobs]);
-  const activeTheme = themeMode === "system" ? systemTheme : themeMode;
+  const activeTheme = themeMode;
 
   async function refreshData() {
     setLoading(true);
@@ -81,17 +79,6 @@ function App() {
     refreshData();
     const interval = window.setInterval(refreshData, 8000);
     return () => window.clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    function handleSystemThemeChange(event) {
-      setSystemTheme(event.matches ? "dark" : "light");
-    }
-
-    mediaQuery.addEventListener("change", handleSystemThemeChange);
-    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
   }, []);
 
   useEffect(() => {
@@ -140,7 +127,6 @@ function App() {
     <main className="app-shell">
       <Header
         activeTab={activeTab}
-        activeTheme={activeTheme}
         loading={loading}
         onRefresh={refreshData}
         onTabChange={setActiveTab}
@@ -148,18 +134,19 @@ function App() {
         tabs={tabs}
         themeMode={themeMode}
       />
+      <div className="shell-body">
+        {error ? (
+          <section className="error-banner" role="alert">
+            <AlertTriangle size={18} />
+            <div>
+              <strong>Backend unreachable</strong>
+              <p>{error}</p>
+            </div>
+          </section>
+        ) : null}
 
-      {error ? (
-        <section className="error-banner" role="alert">
-          <AlertTriangle size={18} />
-          <div>
-            <strong>Backend unreachable</strong>
-            <p>{error}</p>
-          </div>
-        </section>
-      ) : null}
-
-      {renderActiveView()}
+        {renderActiveView()}
+      </div>
     </main>
   );
 }

@@ -10,17 +10,17 @@ export function ArchitectureView() {
         <InfoCard
           icon={Container}
           title="Docker Compose runtime"
-          body="Runs Redis, FastAPI, worker, and Vite dashboard on a shared local network with service health checks."
+          body="Runs Redis, FastAPI, worker, and Vite dashboard on a shared local network with service health checks. Single command to spin up the full stack."
         />
         <InfoCard
           icon={Boxes}
           title="Kubernetes ready"
-          body="Includes namespace, ConfigMap, Deployments, Services, probes, resource limits, and worker autoscaling."
+          body="Includes namespace, ConfigMap, Deployments, Services, probes, resource limits, and worker autoscaling via HorizontalPodAutoscaler."
         />
         <InfoCard
           icon={Network}
           title="Queue-first boundary"
-          body="The API accepts jobs quickly, Redis absorbs queue state, and workers process asynchronously."
+          body="The API accepts jobs quickly, Redis absorbs queue state, and workers process asynchronously. Decoupled submission from execution."
         />
       </div>
     </section>

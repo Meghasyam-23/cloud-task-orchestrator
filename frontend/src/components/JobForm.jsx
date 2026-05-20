@@ -8,7 +8,7 @@ const payloadTemplates = {
   data_cleanup: '{\n  "name": "daily-import",\n  "owner": "",\n  "tags": ["etl", "", null],\n  "metadata": {\n    "region": "us-central1",\n    "notes": null\n  }\n}',
 };
 
-export function JobForm({ submitting, onSubmit }) {
+export function JobForm({ submitting, onSubmit, compact = false }) {
   const [taskType, setTaskType] = useState("text_transform");
   const [payloadText, setPayloadText] = useState(payloadTemplates.text_transform);
   const [error, setError] = useState("");
@@ -47,7 +47,7 @@ export function JobForm({ submitting, onSubmit }) {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="job-form">
+      <form onSubmit={handleSubmit} className={`job-form${compact ? " compact" : ""}`}>
         <label>
           <span>Task type</span>
           <select value={taskType} onChange={handleTaskTypeChange}>

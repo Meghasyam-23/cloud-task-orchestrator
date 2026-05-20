@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Database, Gauge, GitBranch, Server, TerminalSquare } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronDown, Database, Gauge, Server, TerminalSquare } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -207,26 +207,29 @@ export function WorkerInsights({ insights }) {
 
 export function ArchitectureCard() {
   const nodes = [
-    { label: "React Dashboard", icon: Gauge },
-    { label: "FastAPI Backend", icon: Server },
-    { label: "Redis Queue", icon: Database },
-    { label: "Worker Service", icon: TerminalSquare },
-    { label: "Job Result", icon: CheckCircle2 },
+    { label: "React Dashboard", tech: "Vite + Recharts", icon: Gauge },
+    { label: "FastAPI Backend", tech: "Python 3.11, async", icon: Server },
+    { label: "Redis Queue", tech: "v7.2, key-value store", icon: Database },
+    { label: "Worker Service", tech: "3 replicas, async", icon: TerminalSquare },
+    { label: "Job Result", tech: "Redis-persisted state", icon: CheckCircle2 },
   ];
 
   return (
     <section className="panel architecture-panel">
-      <PanelTitle eyebrow="Static architecture" title="System topology" description="Runtime path for submitted work." />
+      <PanelTitle eyebrow="System topology" title="Runtime execution path" description="How a submitted job flows through the stack." />
       <div className="architecture-flow">
         {nodes.map((node, index) => {
           const Icon = node.icon;
           return (
             <div className="architecture-step" key={node.label}>
               <div className="architecture-node">
-                <Icon size={17} />
-                <span>{node.label}</span>
+                <Icon size={18} />
+                <div className="architecture-node-text">
+                  <div className="architecture-node-label">{node.label}</div>
+                  <div className="architecture-node-tech">{node.tech}</div>
+                </div>
               </div>
-              {index < nodes.length - 1 ? <ArrowRight size={16} className="architecture-arrow" /> : null}
+              {index < nodes.length - 1 ? <ArrowRight size={15} className="architecture-arrow" /> : null}
             </div>
           );
         })}
@@ -245,9 +248,10 @@ function PipelineNode({ label, value, tone }) {
 }
 
 function PipelineArrow({ className = "" }) {
+  const isTerminal = className.includes("terminal");
   return (
     <div className={`pipeline-arrow ${className}`} aria-hidden="true">
-      <GitBranch size={16} />
+      {isTerminal ? <ChevronDown size={16} /> : <ArrowRight size={16} />}
     </div>
   );
 }
