@@ -21,6 +21,8 @@ const OperationsTelemetry = lazy(() =>
   })),
 );
 
+const THEME_STORAGE_KEY = "cto-theme-preference";
+
 function App() {
   const [health, setHealth] = useState(null);
   const [jobs, setJobs] = useState([]);
@@ -28,6 +30,12 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [themeMode, setThemeMode] = useState(() => {
+    return window.localStorage.getItem(THEME_STORAGE_KEY) ?? "system";
+  });
+  const [systemTheme, setSystemTheme] = useState(() => {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  });
 
   const selectedJob = useMemo(
     () => jobs.find((job) => job.job_id === selectedJobId) ?? null,
@@ -35,6 +43,7 @@ function App() {
   );
 
   const metrics = useMemo(() => deriveJobMetrics(jobs), [jobs]);
+  const activeTheme = themeMode === "system" ? systemTheme : themeMode;
 
   async function refreshData() {
     setLoading(true);
@@ -79,9 +88,32 @@ function App() {
     return () => window.clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function handleSystemThemeChange(event) {
+      setSystemTheme(event.matches ? "dark" : "light");
+    }
+
+    mediaQuery.addEventListener("change", handleSystemThemeChange);
+    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(THEME_STORAGE_KEY, themeMode);
+    document.documentElement.dataset.theme = activeTheme;
+    document.documentElement.style.colorScheme = activeTheme;
+  }, [activeTheme, themeMode]);
+
   return (
     <main className="app-shell">
-      <Header loading={loading} onRefresh={refreshData} />
+      <Header
+        activeTheme={activeTheme}
+        loading={loading}
+        onRefresh={refreshData}
+        onThemeChange={setThemeMode}
+        themeMode={themeMode}
+      />
 
       {error ? (
         <section className="error-banner" role="alert">
@@ -95,26 +127,27 @@ function App() {
 
       <HealthCards health={health} stats={metrics.stats} loading={loading} />
 
-      <section className="operations-grid" aria-label="Primary operations">
-        <JobForm submitting={submitting} onSubmit={handleCreateJob} />
-        <Suspense fallback={<section className="panel observability-loading compact">Loading queue telemetry...</section>}>
-          <OperationsTelemetry metrics={metrics} />
-        </Suspense>
+      <section className="workspace-grid" aria-label="Primary workspace">
+        <div className="workspace-main">
+          <JobForm submitting={submitting} onSubmit={handleCreateJob} />
+          <JobsTable
+            jobs={jobs}
+            loading={loading}
+            selectedJobId={selectedJobId}
+            onSelectJob={(job) => setSelectedJobId(job.job_id)}
+          />
+        </div>
+        <aside className="workspace-sidebar" aria-label="Queue and job inspection">
+          <Suspense fallback={<section className="panel observability-loading compact">Loading queue telemetry...</section>}>
+            <OperationsTelemetry metrics={metrics} />
+          </Suspense>
+          <JobDetailPanel job={selectedJob} metrics={metrics} onClose={() => setSelectedJobId(null)} />
+        </aside>
       </section>
 
       <Suspense fallback={<section className="panel observability-loading">Loading observability views...</section>}>
         <ObservabilitySection metrics={metrics} loading={loading} />
       </Suspense>
-
-      <div className="jobs-inspector-grid">
-        <JobsTable
-          jobs={jobs}
-          loading={loading}
-          selectedJobId={selectedJobId}
-          onSelectJob={(job) => setSelectedJobId(job.job_id)}
-        />
-        <JobDetailPanel job={selectedJob} onClose={() => setSelectedJobId(null)} />
-      </div>
     </main>
   );
 }

@@ -1,8 +1,8 @@
-import { X } from "lucide-react";
+import { Activity, GitBranch, X } from "lucide-react";
 
 import { StatusBadge } from "./StatusBadge.jsx";
 
-export function JobDetailPanel({ job, onClose }) {
+export function JobDetailPanel({ job, metrics, onClose }) {
   return (
     <aside className={`detail-panel ${job ? "open" : ""}`} aria-label="Job detail">
       {job ? (
@@ -42,11 +42,49 @@ export function JobDetailPanel({ job, onClose }) {
           <DetailBlock title="Error" value={job.error} emptyValue="No error recorded." />
         </>
       ) : (
-        <div className="detail-placeholder">
-          <p>Select a job to inspect payload, result, error, retries, and timestamps.</p>
-        </div>
+        <SystemSnapshot metrics={metrics} />
       )}
     </aside>
+  );
+}
+
+function SystemSnapshot({ metrics }) {
+  const snapshotItems = [
+    { label: "Total", value: metrics.stats.total },
+    { label: "Completed", value: metrics.stats.completed },
+    { label: "Failed", value: metrics.stats.failed },
+    { label: "Queue depth", value: metrics.insights.queueDepth },
+    { label: "Active jobs", value: metrics.insights.activeJobs },
+  ];
+
+  return (
+    <div className="snapshot-panel">
+      <div className="snapshot-header">
+        <div className="snapshot-icon" aria-hidden="true">
+          <Activity size={17} />
+        </div>
+        <div>
+          <p className="eyebrow">System snapshot</p>
+          <h2>No job selected</h2>
+          <p>Select a job to inspect payload, result, error, retries, and timestamps.</p>
+        </div>
+      </div>
+      <div className="snapshot-metrics">
+        {snapshotItems.map((item) => (
+          <div key={item.label}>
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
+      <div className="lifecycle-hint" aria-label="Job lifecycle hint">
+        <GitBranch size={15} />
+        <span>Submitted</span>
+        <span>Queued</span>
+        <span>Running</span>
+        <span>Completed</span>
+      </div>
+    </div>
   );
 }
 

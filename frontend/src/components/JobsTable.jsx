@@ -43,6 +43,13 @@ export function JobsTable({ jobs, selectedJobId, onSelectJob, loading }) {
                   className={job.job_id === selectedJobId ? "selected-row" : ""}
                   key={job.job_id}
                   onClick={() => onSelectJob(job)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onSelectJob(job);
+                    }
+                  }}
+                  tabIndex={0}
                 >
                   <td className="mono truncate">{job.job_id}</td>
                   <td>{job.task_type}</td>

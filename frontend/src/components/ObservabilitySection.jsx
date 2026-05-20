@@ -15,16 +15,16 @@ import {
 } from "recharts";
 
 const STATUS_COLORS = {
-  QUEUED: "#d19a3a",
-  RUNNING: "#6ea8fe",
-  COMPLETED: "#4ec9a6",
-  FAILED: "#f97066",
+  QUEUED: "var(--status-queued)",
+  RUNNING: "var(--status-running)",
+  COMPLETED: "var(--status-completed)",
+  FAILED: "var(--status-failed)",
 };
 
 const TASK_COLORS = {
-  text_transform: "#8fb8ff",
-  data_cleanup: "#7dd3c7",
-  file_summary: "#c4a7ff",
+  text_transform: "var(--chart-blue)",
+  data_cleanup: "var(--chart-teal)",
+  file_summary: "var(--chart-violet)",
 };
 
 export function ObservabilitySection({ metrics, loading }) {
@@ -58,14 +58,14 @@ function ThroughputChart({ data, loading }) {
       <ChartFrame empty={!loading && data.length === 0}>
         <ResponsiveContainer width="100%" height={280}>
           <LineChart data={data} margin={{ top: 12, right: 18, bottom: 0, left: -18 }}>
-            <CartesianGrid stroke="rgba(148, 163, 184, 0.16)" vertical={false} />
-            <XAxis dataKey="time" tickLine={false} axisLine={false} tick={{ fill: "#8b95a7", fontSize: 11 }} />
-            <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fill: "#8b95a7", fontSize: 11 }} />
+            <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
+            <XAxis dataKey="time" tickLine={false} axisLine={false} tick={{ fill: "var(--muted)", fontSize: 11 }} />
+            <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fill: "var(--muted)", fontSize: 11 }} />
             <Tooltip content={<ChartTooltip />} />
             <Line
               type="monotone"
               dataKey="submitted"
-              stroke="#8fb8ff"
+              stroke="var(--chart-blue)"
               strokeWidth={2}
               dot={{ r: 3, strokeWidth: 0 }}
               activeDot={{ r: 5 }}
@@ -73,7 +73,7 @@ function ThroughputChart({ data, loading }) {
             <Line
               type="monotone"
               dataKey="completed"
-              stroke="#4ec9a6"
+              stroke="var(--status-completed)"
               strokeWidth={2}
               dot={{ r: 3, strokeWidth: 0 }}
               activeDot={{ r: 5 }}
@@ -155,15 +155,15 @@ function TaskTypeBreakdown({ data, loading }) {
       <ChartFrame empty={!loading && !hasData}>
         <ResponsiveContainer width="100%" height={230}>
           <BarChart data={data} layout="vertical" margin={{ top: 8, right: 18, bottom: 0, left: 18 }}>
-            <CartesianGrid stroke="rgba(148, 163, 184, 0.16)" horizontal={false} />
-            <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} tick={{ fill: "#8b95a7", fontSize: 11 }} />
+            <CartesianGrid stroke="var(--chart-grid)" horizontal={false} />
+            <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} tick={{ fill: "var(--muted)", fontSize: 11 }} />
             <YAxis
               dataKey="name"
               type="category"
               width={112}
               tickLine={false}
               axisLine={false}
-              tick={{ fill: "#cbd5e1", fontSize: 11 }}
+              tick={{ fill: "var(--text-secondary)", fontSize: 11 }}
             />
             <Tooltip content={<ChartTooltip />} />
             <Bar dataKey="value" radius={[0, 5, 5, 0]}>
@@ -265,7 +265,18 @@ function PanelTitle({ eyebrow, title, description }) {
 }
 
 function ChartFrame({ empty, children }) {
-  return <div className="chart-frame">{empty ? <div className="chart-empty">No job data yet.</div> : children}</div>;
+  return (
+    <div className="chart-frame">
+      {empty ? (
+        <div className="chart-empty">
+          <strong>No job data yet</strong>
+          <span>Submit a job to populate this view from Redis-backed job metadata.</span>
+        </div>
+      ) : (
+        children
+      )}
+    </div>
+  );
 }
 
 function LegendGrid({ items, colors }) {
