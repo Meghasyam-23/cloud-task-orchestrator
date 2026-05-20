@@ -1,5 +1,5 @@
 import { AlertTriangle } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 
 import { createJob, getHealth, getJobs } from "./api/client.js";
 import { Header } from "./components/Header.jsx";
@@ -7,6 +7,13 @@ import { HealthCards } from "./components/HealthCards.jsx";
 import { JobDetailPanel } from "./components/JobDetailPanel.jsx";
 import { JobForm } from "./components/JobForm.jsx";
 import { JobsTable } from "./components/JobsTable.jsx";
+import { deriveJobMetrics } from "./utils/jobMetrics.js";
+
+const ObservabilitySection = lazy(() =>
+  import("./components/ObservabilitySection.jsx").then((module) => ({
+    default: module.ObservabilitySection,
+  })),
+);
 
 function App() {
   const [health, setHealth] = useState(null);
@@ -21,19 +28,7 @@ function App() {
     [jobs, selectedJobId],
   );
 
-  const stats = useMemo(() => {
-    return jobs.reduce(
-      (acc, job) => {
-        acc.total += 1;
-        const key = job.status?.toLowerCase();
-        if (key && key in acc) {
-          acc[key] += 1;
-        }
-        return acc;
-      },
-      { total: 0, queued: 0, running: 0, completed: 0, failed: 0 },
-    );
-  }, [jobs]);
+  const metrics = useMemo(() => deriveJobMetrics(jobs), [jobs]);
 
   async function refreshData() {
     setLoading(true);
@@ -92,7 +87,11 @@ function App() {
         </section>
       ) : null}
 
-      <HealthCards health={health} stats={stats} loading={loading} />
+      <HealthCards health={health} stats={metrics.stats} loading={loading} />
+
+      <Suspense fallback={<section className="panel observability-loading">Loading observability views...</section>}>
+        <ObservabilitySection metrics={metrics} loading={loading} />
+      </Suspense>
 
       <div className="dashboard-grid">
         <div className="main-column">

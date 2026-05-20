@@ -53,7 +53,7 @@ curl http://localhost:8000/jobs
 
 ## Frontend Development
 
-The dashboard is a Vite + React app in `frontend/`.
+The dashboard is a Vite + React app in `frontend/`. Observability charts are rendered with Recharts and are derived from the live `GET /jobs` API response.
 
 Run it through Docker Compose with the full stack:
 
