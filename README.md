@@ -2,9 +2,9 @@
 
 Cloud Task Orchestrator is a production-style cloud-native task orchestration platform for submitting, queueing, processing, and observing asynchronous background jobs.
 
-It includes a FastAPI service, Redis-backed job queue, horizontally runnable worker service, Docker Compose local stack, and a polished React dashboard for job submission, queue visibility, health checks, job inspection, and observability charts.
+It includes a FastAPI service, Redis-backed job queue, horizontally runnable worker service, Docker Compose local stack, local Kubernetes manifests, and a polished React dashboard for job submission, queue visibility, health checks, job inspection, and observability charts.
 
-The project is intentionally scoped to a local cloud-native foundation: clean service boundaries, containerized components, real Redis state, and a dashboard that uses live API responses. Kubernetes manifests are intentionally not included yet.
+The project is intentionally scoped to a local cloud-native foundation: clean service boundaries, containerized components, real Redis state, local Kubernetes deployment files, and a dashboard that uses live API responses.
 
 ## Architecture
 
@@ -37,6 +37,7 @@ Core services:
 - **Redis**: Queue and metadata store. Job IDs are pushed into `job_queue`.
 - **Worker**: Python service that consumes job IDs, updates status, processes payloads, and writes results.
 - **Docker Compose**: Local multi-service runtime with internal networking and health checks.
+- **Kubernetes**: Local-dev manifests for Docker Desktop Kubernetes or minikube.
 
 More detail: [docs/architecture.md](docs/architecture.md)
 
@@ -57,6 +58,7 @@ More detail: [docs/architecture.md](docs/architecture.md)
 - Recharts observability visuals derived from real `GET /jobs` data.
 - Light, dark, and system theme support with local preference persistence.
 - Dockerized frontend, backend, worker, and Redis.
+- Kubernetes manifests with probes, resource requests/limits, and worker autoscaling.
 - Smoke test script for end-to-end local validation.
 
 ## Tech Stack
@@ -68,6 +70,7 @@ More detail: [docs/architecture.md](docs/architecture.md)
 | Queue and store | Redis 7 |
 | Worker | Python, redis-py |
 | Local runtime | Docker Compose |
+| Local orchestration | Kubernetes manifests |
 | Packaging | Dockerfiles per service |
 
 ## Repository Structure
@@ -97,7 +100,15 @@ scripts/
 docs/
   architecture.md
   demo-flow.md
+  kubernetes.md
   screenshots.md
+k8s/
+  namespace.yaml
+  configmap.yaml
+  redis.yaml
+  backend.yaml
+  worker.yaml
+  frontend.yaml
 docker-compose.yml
 ```
 
@@ -168,6 +179,39 @@ VITE_API_URL=http://localhost:8000 npm run dev
 ```
 
 The dashboard does not use fake random data. If the backend is unreachable, it shows an explicit error state.
+
+## Kubernetes
+
+Local Kubernetes manifests are available in `k8s/`.
+
+Build local images:
+
+```bash
+docker compose build
+```
+
+Apply manifests:
+
+```bash
+kubectl apply -f k8s/
+```
+
+Port-forward the backend and frontend in separate terminals:
+
+```bash
+kubectl -n cloud-task-orchestrator port-forward svc/backend 8000:8000
+kubectl -n cloud-task-orchestrator port-forward svc/frontend 5173:5173
+```
+
+Then open:
+
+```text
+http://localhost:5173
+```
+
+The worker deployment starts with 2 replicas and includes a HorizontalPodAutoscaler that can scale workers up to 5 replicas.
+
+More detail: [docs/kubernetes.md](docs/kubernetes.md)
 
 ## API Examples
 
@@ -298,6 +342,7 @@ Use Docker Compose for the quickest consistent runtime. For local Python develop
 
 - [Architecture](docs/architecture.md)
 - [Demo flow](docs/demo-flow.md)
+- [Kubernetes](docs/kubernetes.md)
 - [Screenshot checklist](docs/screenshots.md)
 
 ## Roadmap
@@ -308,7 +353,7 @@ Use Docker Compose for the quickest consistent runtime. For local Python develop
 - Add pagination and filtering for the jobs table.
 - Add structured API tests and worker integration tests.
 - Add authentication and role-aware dashboard views.
-- Add production deployment manifests in a future phase.
+- Add hardened production deployment options in a future phase.
 
 ## License
 

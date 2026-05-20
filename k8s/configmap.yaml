@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloud-task-config
+  namespace: cloud-task-orchestrator
+  labels:
+    app.kubernetes.io/name: cloud-task-orchestrator
+data:
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  CORS_ORIGINS: http://localhost:5173
+  VITE_API_URL: http://localhost:8000
