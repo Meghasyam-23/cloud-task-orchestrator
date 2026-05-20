@@ -14,7 +14,7 @@ class TaskType(str, Enum):
 class JobStatus(str, Enum):
     QUEUED = "QUEUED"
     RUNNING = "RUNNING"
-    SUCCEEDED = "SUCCEEDED"
+    COMPLETED = "COMPLETED"
     FAILED = "FAILED"
 
 
@@ -35,6 +35,9 @@ class JobResponse(BaseModel):
     task_type: TaskType
     payload: dict[str, Any]
     status: JobStatus
+    result: dict[str, Any] | None = None
+    error: str | None = None
+    retry_count: int = 0
     created_at: datetime
     updated_at: datetime
 

@@ -28,6 +28,7 @@ class JobStore:
             task_type=request.task_type,
             payload=request.payload,
             status=JobStatus.QUEUED,
+            retry_count=0,
             created_at=now,
             updated_at=now,
         )
@@ -71,16 +72,25 @@ class JobStore:
             "task_type": job.task_type.value,
             "payload": json.dumps(job.payload),
             "status": job.status.value,
+            "result": json.dumps(job.result),
+            "error": job.error or "",
+            "retry_count": str(job.retry_count),
             "created_at": job.created_at.isoformat(),
             "updated_at": job.updated_at.isoformat(),
         }
 
     def _deserialize_job(self, data: dict[str, str]) -> JobResponse:
+        result = json.loads(data.get("result", "null"))
+        error = data.get("error") or None
+
         return JobResponse(
             job_id=data["job_id"],
             task_type=TaskType(data["task_type"]),
             payload=json.loads(data["payload"]),
             status=JobStatus(data["status"]),
+            result=result,
+            error=error,
+            retry_count=int(data.get("retry_count", "0")),
             created_at=datetime.fromisoformat(data["created_at"]),
             updated_at=datetime.fromisoformat(data["updated_at"]),
         )
