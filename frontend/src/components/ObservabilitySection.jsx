@@ -41,13 +41,13 @@ export function ObservabilitySection({ metrics, loading }) {
 export function OperationsTelemetry({ metrics }) {
   return (
     <div className="operations-telemetry" aria-label="Queue pipeline and worker insights">
-      <PipelineVisualization data={metrics.pipelineData} total={metrics.stats.total} />
+      <QueuePipeline data={metrics.pipelineData} total={metrics.stats.total} />
       <WorkerInsights insights={metrics.insights} />
     </div>
   );
 }
 
-function ThroughputChart({ data, loading }) {
+export function ThroughputChart({ data, loading }) {
   return (
     <section className="panel chart-panel throughput-panel">
       <PanelTitle
@@ -85,7 +85,7 @@ function ThroughputChart({ data, loading }) {
   );
 }
 
-function StatusDonut({ data, total, loading }) {
+export function StatusDonut({ data, total, loading }) {
   return (
     <section className="panel chart-panel">
       <PanelTitle eyebrow="State" title="Job status" description="Current distribution from Redis-backed job metadata." />
@@ -112,7 +112,7 @@ function StatusDonut({ data, total, loading }) {
   );
 }
 
-function PipelineVisualization({ data, total }) {
+export function QueuePipeline({ data, total }) {
   const submitted = data.find((item) => item.name === "Submitted")?.value ?? 0;
   const queued = data.find((item) => item.name === "Queued")?.value ?? 0;
   const running = data.find((item) => item.name === "Running")?.value ?? 0;
@@ -146,7 +146,7 @@ function PipelineVisualization({ data, total }) {
   );
 }
 
-function TaskTypeBreakdown({ data, loading }) {
+export function TaskTypeBreakdown({ data, loading }) {
   const hasData = data.some((item) => item.value > 0);
 
   return (
@@ -178,7 +178,7 @@ function TaskTypeBreakdown({ data, loading }) {
   );
 }
 
-function WorkerInsights({ insights }) {
+export function WorkerInsights({ insights }) {
   const items = [
     { label: "Queue depth", value: insights.queueDepth, hint: "QUEUED jobs" },
     { label: "Active jobs", value: insights.activeJobs, hint: "RUNNING jobs" },
@@ -205,7 +205,7 @@ function WorkerInsights({ insights }) {
   );
 }
 
-function ArchitectureCard() {
+export function ArchitectureCard() {
   const nodes = [
     { label: "React Dashboard", icon: Gauge },
     { label: "FastAPI Backend", icon: Server },

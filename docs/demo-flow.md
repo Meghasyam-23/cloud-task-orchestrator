@@ -1,6 +1,6 @@
 # Local Demo Flow
 
-This guide walks through a complete local demo of Cloud Task Orchestrator.
+This guide walks through a complete local demo of Cloud Task Orchestrator using Docker Compose.
 
 ## 1. Start the Stack
 
@@ -29,7 +29,7 @@ Open:
 http://localhost:5173
 ```
 
-Point out:
+Show:
 
 - Health summary cards.
 - Submit Job form.
@@ -101,7 +101,7 @@ Expected result:
 
 Scroll to the observability section.
 
-Point out:
+Show:
 
 - Throughput chart uses job timestamps.
 - Status donut uses real current job statuses.

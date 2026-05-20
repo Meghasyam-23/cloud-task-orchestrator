@@ -2,13 +2,23 @@ import { ChevronRight, Inbox } from "lucide-react";
 
 import { StatusBadge } from "./StatusBadge.jsx";
 
-export function JobsTable({ jobs, selectedJobId, onSelectJob, loading }) {
+export function JobsTable({
+  compact = false,
+  description = "Live queue and processing history from the backend API.",
+  emptyDescription = "Submit a job to watch it move from queued to completed.",
+  emptyTitle = "No jobs yet",
+  jobs,
+  loading,
+  onSelectJob,
+  selectedJobId,
+  title = "Jobs",
+}) {
   return (
-    <section className="panel jobs-panel">
+    <section className={`panel jobs-panel ${compact ? "compact-table" : ""}`}>
       <div className="panel-heading">
         <div>
-          <h2>Jobs</h2>
-          <p>Live queue and processing history from the backend API.</p>
+          <h2>{title}</h2>
+          <p>{description}</p>
         </div>
       </div>
 
@@ -21,8 +31,8 @@ export function JobsTable({ jobs, selectedJobId, onSelectJob, loading }) {
       ) : jobs.length === 0 ? (
         <div className="empty-state">
           <Inbox size={28} />
-          <h3>No jobs yet</h3>
-          <p>Submit a job to watch it move from queued to completed.</p>
+          <h3>{emptyTitle}</h3>
+          <p>{emptyDescription}</p>
         </div>
       ) : (
         <div className="table-wrap">

@@ -1,10 +1,12 @@
 # Cloud Task Orchestrator
 
-Cloud Task Orchestrator is a production-style cloud-native task orchestration platform for submitting, queueing, processing, and observing asynchronous background jobs.
+**A cloud-native job orchestration lab with a real API, Redis queue, worker fleet, Kubernetes manifests, and observability dashboard.**
 
-It includes a FastAPI service, Redis-backed job queue, horizontally runnable worker service, Docker Compose local stack, local Kubernetes manifests, and a polished React dashboard for job submission, queue visibility, health checks, job inspection, and observability charts.
+Cloud Task Orchestrator is a hands-on distributed systems project for submitting, queueing, processing, and observing asynchronous background jobs.
 
-The project is intentionally scoped to a local cloud-native foundation: clean service boundaries, containerized components, real Redis state, local Kubernetes deployment files, and a dashboard that uses live API responses.
+It includes a FastAPI service, Redis-backed job queue, horizontally runnable worker service, Docker Compose stack, local Kubernetes manifests, and a React dashboard for job submission, queue visibility, health checks, job inspection, and observability charts.
+
+The project is intentionally scoped to a local cloud-native foundation: clean service boundaries, containerized components, real Redis state, local Kubernetes deployment files, and a dashboard that uses live API responses rather than mock data.
 
 ## Architecture
 
@@ -60,6 +62,17 @@ More detail: [docs/architecture.md](docs/architecture.md)
 - Dockerized frontend, backend, worker, and Redis.
 - Kubernetes manifests with probes, resource requests/limits, and worker autoscaling.
 - Smoke test script for end-to-end local validation.
+
+## What This Demonstrates
+
+Cloud Task Orchestrator is built to show the moving parts behind a practical distributed workload system:
+
+- **Distributed systems fundamentals**: separate API, queue, worker, and UI processes with clear service boundaries.
+- **Asynchronous job orchestration**: jobs are accepted immediately, queued in Redis, processed out of band, and tracked through lifecycle states.
+- **Queue-backed workers**: worker replicas claim work from `job_queue`, update Redis metadata, and store results or errors.
+- **Containerized development**: Dockerfiles and Docker Compose run the full stack locally with health checks and service networking.
+- **Kubernetes readiness**: manifests define Deployments, Services, ConfigMaps, probes, resources, and worker autoscaling for local clusters.
+- **Observability mindset**: the dashboard surfaces system health, queue depth, throughput, status distribution, task mix, retries, and job-level inspection.
 
 ## Tech Stack
 
@@ -179,6 +192,8 @@ VITE_API_URL=http://localhost:8000 npm run dev
 ```
 
 The dashboard does not use fake random data. If the backend is unreachable, it shows an explicit error state.
+
+Screenshot guidance for publishing or portfolio use is in [docs/screenshots.md](docs/screenshots.md).
 
 ## Kubernetes
 
@@ -343,7 +358,7 @@ Use Docker Compose for the quickest consistent runtime. For local Python develop
 - [Architecture](docs/architecture.md)
 - [Demo flow](docs/demo-flow.md)
 - [Kubernetes](docs/kubernetes.md)
-- [Screenshot checklist](docs/screenshots.md)
+- [Screenshots](docs/screenshots.md)
 
 ## Roadmap
 

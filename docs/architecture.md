@@ -1,6 +1,6 @@
 # Architecture
 
-Cloud Task Orchestrator is split into independently containerized services connected by Docker Compose. The system models a common cloud-native pattern: an API accepts work, Redis stores queue state, workers process jobs asynchronously, and a dashboard provides operator visibility.
+Cloud Task Orchestrator is split into independently containerized services that can run through Docker Compose or local Kubernetes. The system models a common cloud-native pattern: an API accepts work, Redis stores queue state, workers process jobs asynchronously, and a dashboard provides operator visibility.
 
 ## System Diagram
 
@@ -19,7 +19,7 @@ flowchart LR
 
 ### React Dashboard
 
-The dashboard is the operator control plane.
+The dashboard is the operator-facing control plane.
 
 Responsibilities:
 
@@ -52,7 +52,7 @@ The backend reads Redis connection settings from `REDIS_HOST` and `REDIS_PORT`.
 
 ### Redis Queue
 
-Redis is both the queue and metadata store.
+Redis is both the queue and the job metadata store.
 
 Current key patterns:
 

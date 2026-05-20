@@ -1,6 +1,6 @@
 # Screenshot Checklist
 
-Use this checklist before publishing the project publicly. Store final images in a future `docs/assets/` folder, then update the placeholders below.
+Use this checklist before publishing the project publicly. Store final images in `docs/assets/`, then update the placeholders below.
 
 ## Recommended Screenshots
 

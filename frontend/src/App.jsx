@@ -1,29 +1,24 @@
 import { AlertTriangle } from "lucide-react";
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { createJob, getHealth, getJobs } from "./api/client.js";
 import { Header } from "./components/Header.jsx";
-import { HealthCards } from "./components/HealthCards.jsx";
-import { JobDetailPanel } from "./components/JobDetailPanel.jsx";
-import { JobForm } from "./components/JobForm.jsx";
-import { JobsTable } from "./components/JobsTable.jsx";
 import { deriveJobMetrics } from "./utils/jobMetrics.js";
-
-const ObservabilitySection = lazy(() =>
-  import("./components/ObservabilitySection.jsx").then((module) => ({
-    default: module.ObservabilitySection,
-  })),
-);
-
-const OperationsTelemetry = lazy(() =>
-  import("./components/ObservabilitySection.jsx").then((module) => ({
-    default: module.OperationsTelemetry,
-  })),
-);
+import { ArchitectureView } from "./views/ArchitectureView.jsx";
+import { JobsView } from "./views/JobsView.jsx";
+import { MonitoringView } from "./views/MonitoringView.jsx";
+import { OverviewView } from "./views/OverviewView.jsx";
 
 const THEME_STORAGE_KEY = "cto-theme-preference";
+const tabs = [
+  { id: "overview", label: "Overview" },
+  { id: "jobs", label: "Jobs" },
+  { id: "monitoring", label: "Monitoring" },
+  { id: "architecture", label: "Architecture" },
+];
 
 function App() {
+  const [activeTab, setActiveTab] = useState("overview");
   const [health, setHealth] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
@@ -105,13 +100,52 @@ function App() {
     document.documentElement.style.colorScheme = activeTheme;
   }, [activeTheme, themeMode]);
 
+  function handleSelectJob(job) {
+    setSelectedJobId(job?.job_id ?? null);
+  }
+
+  function renderActiveView() {
+    const sharedProps = {
+      jobs,
+      loading,
+      metrics,
+      onSelectJob: handleSelectJob,
+      selectedJob,
+      selectedJobId,
+    };
+
+    if (activeTab === "jobs") {
+      return <JobsView {...sharedProps} />;
+    }
+
+    if (activeTab === "monitoring") {
+      return <MonitoringView loading={loading} metrics={metrics} />;
+    }
+
+    if (activeTab === "architecture") {
+      return <ArchitectureView />;
+    }
+
+    return (
+      <OverviewView
+        {...sharedProps}
+        health={health}
+        onSubmitJob={handleCreateJob}
+        submitting={submitting}
+      />
+    );
+  }
+
   return (
     <main className="app-shell">
       <Header
+        activeTab={activeTab}
         activeTheme={activeTheme}
         loading={loading}
         onRefresh={refreshData}
+        onTabChange={setActiveTab}
         onThemeChange={setThemeMode}
+        tabs={tabs}
         themeMode={themeMode}
       />
 
@@ -125,29 +159,7 @@ function App() {
         </section>
       ) : null}
 
-      <HealthCards health={health} stats={metrics.stats} loading={loading} />
-
-      <section className="workspace-grid" aria-label="Primary workspace">
-        <div className="workspace-main">
-          <JobForm submitting={submitting} onSubmit={handleCreateJob} />
-          <JobsTable
-            jobs={jobs}
-            loading={loading}
-            selectedJobId={selectedJobId}
-            onSelectJob={(job) => setSelectedJobId(job.job_id)}
-          />
-        </div>
-        <aside className="workspace-sidebar" aria-label="Queue and job inspection">
-          <Suspense fallback={<section className="panel observability-loading compact">Loading queue telemetry...</section>}>
-            <OperationsTelemetry metrics={metrics} />
-          </Suspense>
-          <JobDetailPanel job={selectedJob} metrics={metrics} onClose={() => setSelectedJobId(null)} />
-        </aside>
-      </section>
-
-      <Suspense fallback={<section className="panel observability-loading">Loading observability views...</section>}>
-        <ObservabilitySection metrics={metrics} loading={loading} />
-      </Suspense>
+      {renderActiveView()}
     </main>
   );
 }

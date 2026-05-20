@@ -1,8 +1,8 @@
 # Kubernetes
 
-Cloud Task Orchestrator includes local-development Kubernetes manifests for Docker Desktop Kubernetes or minikube.
+Cloud Task Orchestrator includes local Kubernetes manifests for Docker Desktop Kubernetes or minikube.
 
-The manifests are intentionally simple:
+The manifests are intentionally small and readable:
 
 - One namespace: `cloud-task-orchestrator`
 - One ConfigMap for shared runtime settings
